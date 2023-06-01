@@ -28,6 +28,8 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
+AUTH_USER_MODEL = 'portal_authentication.User'
+
 
 # Application definition
 
@@ -38,6 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'portal_accounts_api.apps.PortalAccountsApiConfig',
+    'portal_admin_api.apps.PortalAdminApiConfig',
+    'portal_library_api.apps.PortalLibraryApiConfig',
+    'portal_students_api.apps.PortalStudentsApiConfig',
+    'portal_schools_api.apps.PortalSchoolsApiConfig',
+    'portal_authentication.apps.PortalAuthenticationConfig',
+
+
 ]
 
 MIDDLEWARE = [
