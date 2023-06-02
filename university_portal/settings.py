@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'portal_students_api.apps.PortalStudentsApiConfig',
     'portal_schools_api.apps.PortalSchoolsApiConfig',
     'portal_authentication.apps.PortalAuthenticationConfig',
+    'rest_framework',
 
 
 ]
