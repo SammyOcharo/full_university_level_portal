@@ -42,3 +42,15 @@ class LoginOtp(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class PasswordResetOtp(models.Model):
+    email = models.EmailField()
+    otp = models.IntegerField()
+    is_validated = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'password_reset_otp'
+
+    def __str__(self):
+        return self.email
