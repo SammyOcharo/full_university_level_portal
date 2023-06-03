@@ -6,3 +6,7 @@ class AdminLoginSerializer(serializers.Serializer):
     password = serializers.CharField(
         style={'input_type': 'password'}, trim_whitespace=False
     )
+
+class VerifyLoginSerializer(serializers.Serializer):
+   username = serializers.EmailField()
+   otp = serializers.IntegerField()
