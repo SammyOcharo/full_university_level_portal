@@ -30,3 +30,15 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+    
+
+class LoginOtp(models.Model):
+    email = models.EmailField()
+    otp = models.IntegerField()
+    is_validated = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'login_otp'
+
+    def __str__(self):
+        return self.email

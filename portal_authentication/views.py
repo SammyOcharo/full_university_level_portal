@@ -3,11 +3,16 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from portal_authentication.serializers import AdminLoginSerializer
+from portal_authentication.models import LoginOtp
+
+from portal_authentication.serializers import AdminLoginSerializer, VerifyLoginSerializer
 
 import re
 import random
+
+from utils.email_service import login_otp_email
 User = get_user_model()
 
 class AdminLoginAPIView(APIView):
@@ -22,7 +27,7 @@ class AdminLoginAPIView(APIView):
             if not serializer.is_valid():
                 return Response({
                     'status': False,
-                    'message': 'Inalid data provided.',
+                    'message': 'Invalid data provided.',
                     'error': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
             
@@ -78,9 +83,19 @@ class AdminLoginAPIView(APIView):
             
             otp_code = random.randint(111111, 999999)
 
-            print(otp_code)
+            #Save otp to table
+            if not LoginOtp.objects.create(email=username, otp=otp_code):
+                return Response({
+                    'status': False,
+                    'message': 'Error saving otp to database'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             #send email here
+            if not login_otp_email(email=username, otp=otp_code):
+                return Response({
+                    'status': False,
+                    'message': 'Error sending email'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({
                     'status': False,
@@ -93,4 +108,88 @@ class AdminLoginAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Login Unsuccessful. please contact admin/IT'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class VerifyLoginAPIView(APIView):
+    serializer_class = VerifyLoginSerializer
+
+    def post(self, request):
+        try:
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided.',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            username = request.data.get('username')
+            otp = request.data.get('otp')
+
+            otp = int(otp)
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, username)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = User.objects.filter(email=username)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            user = user.first()
+            
+            login_otp = LoginOtp.objects.filter(email=username)
+
+            if not login_otp.exists():
+                return Response({
+                    'status': False,
+                    'message': 'otp with this email does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            login_otp = login_otp.last()
+            print(type(login_otp.otp))
+            print(type(otp))
+            if login_otp.otp != otp:
+                return Response({
+                    'status': False,
+                    'message': 'otp mismatch'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            if login_otp.is_validated == 1:
+                return Response({
+                    'status': False,
+                    'message': 'otp already validated'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            login_otp.is_validated=1
+            login_otp.save()
+
+            print("otp validated")
+
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'status': True,
+                'message': 'Logged in successfully',
+                'access_token': str(refresh.access_token)
+            })
+
+        except Exception as e:
+            print(e)
+
+            return Response({
+                'status': False,
+                'message': 'Could not log you in'
             }, status=status.HTTP_400_BAD_REQUEST)
