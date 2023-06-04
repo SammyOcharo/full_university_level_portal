@@ -162,7 +162,7 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 
 
 
-#SIMPLE JWT CONF
+#SIMPLE JWT CONFIGURATIONS
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
