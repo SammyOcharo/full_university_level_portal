@@ -19,7 +19,7 @@ class AdminLoginAPIView(APIView):
     serializer_class = AdminLoginSerializer
 
     def post(self, request):
-        try:
+        try:           
             data = request.data
 
             serializer = self.serializer_class(data=data)
@@ -58,7 +58,7 @@ class AdminLoginAPIView(APIView):
             if not user.role.short_name in allowed_roles:
                 return Response({
                     'status': False,
-                    'message': 'User with this role not allowed to access this portal'
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             if user.status == 0:
@@ -149,6 +149,12 @@ class VerifyLoginAPIView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
             
             user = user.first()
+            allowed_roles = ['admin']
+            if not user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             login_otp = LoginOtp.objects.filter(email=username)
 
@@ -229,6 +235,15 @@ class AdminForgotPasswordAPIView(APIView):
                     'message': 'User does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
             
+            user = user.first()
+            
+            allowed_roles = ['admin']
+            if not user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             otp_code = random.randint(111111, 999999)
 
             #Save otp to table
@@ -298,6 +313,13 @@ class VerifyOtpForgotPasswordAPIView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
             
             user = user.first()
+
+            allowed_roles = ['admin']
+            if not user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             password_reset_otp = PasswordResetOtp.objects.filter(email=email)
 
@@ -383,6 +405,13 @@ class AdminNewPasswordAPIView(APIView):
             
             user = user.first()
 
+            allowed_roles = ['admin']
+            if not user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             password_match = user.check_password(old_password)
             
             print('password_match: ', password_match)
@@ -463,6 +492,15 @@ class AdminResendOtpAPIView(APIView):
                     'status': False,
                     'message': 'User does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
+            
+            user = user.first()
+            
+            allowed_roles = ['admin']
+            if not user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'user with this role {user.role.short_name} not allowed to access this portal',
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             otp_code = random.randint(111111, 999999)
 

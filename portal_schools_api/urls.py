@@ -1,6 +1,6 @@
 from django.urls import path
-
+from . import views
 
 urlpatterns = [
-    # path()
+    path('admin-create-school/', views.AdminCreateSchoolAPIView.as_view(), name='admin-create-school-api')
 ]
