@@ -8,6 +8,7 @@ class FacultySchool(models.Model):
     school_name = models.CharField(max_length=40)
     school_dean = models.CharField(max_length=50)
     school_description = models.CharField(max_length=255)
+    status = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'school'

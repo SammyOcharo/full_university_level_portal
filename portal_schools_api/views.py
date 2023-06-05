@@ -3,10 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 import uuid
+import re
 from portal_schools_api.models import FacultySchool
 
-from portal_schools_api.serializers import AdminCreateSchoolSerializer
+from portal_schools_api.serializers import AdminCreateSchoolSerializer, AdminDeactivateSchoolSerializer
 
 
 # Create your views here.
@@ -77,4 +82,87 @@ class AdminCreateSchoolAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'could not create the school for some reason!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminDeactivateSchoolAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeactivateSchoolSerializer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            school_name = request.data.get('school_name')
+            admin_email = request.data.get('admin_email')
+            school_code = request.data.get('school_code')
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, admin_email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(admin_email)
+            
+            user = User.objects.filter(email=admin_email)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = FacultySchool.objects.filter(school_code=school_code, school_name=school_name)
+
+            if not school.exists():
+                return Response({
+                    'status': False,
+                    'message': f'{school_name} does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = school.first()
+
+            if  school.status == 2:
+                return Response({
+                    'status': False,
+                    'message': f'{school_name} already deactivated'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            school.status=2
+            school.save()
+            print("School deactivated!")
+
+            return Response({
+                'status': True,
+                'message': f'{school_name} deactivated!'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not deactivate schhol!'
             }, status=status.HTTP_400_BAD_REQUEST)
