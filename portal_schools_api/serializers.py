@@ -15,3 +15,8 @@ class AdminDeactivateSchoolSerializer(serializers.Serializer):
     admin_email = serializers.EmailField()
     school_code = serializers.CharField()
     school_name = serializers.CharField()
+
+class AdminDeleteSchoolSerializer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    school_code = serializers.CharField()
+    school_name = serializers.CharField()
