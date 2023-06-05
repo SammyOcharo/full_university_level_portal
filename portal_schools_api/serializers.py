@@ -6,6 +6,11 @@ class AdminCreateSchoolSerializer(serializers.Serializer):
     school_dean = serializers.CharField()
     school_description = serializers.CharField()
 
+class AdminActivateSchoolSerializer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    school_code = serializers.CharField()
+    school_name = serializers.CharField()
+
 class AdminDeactivateSchoolSerializer(serializers.Serializer):
     admin_email = serializers.EmailField()
     school_code = serializers.CharField()
