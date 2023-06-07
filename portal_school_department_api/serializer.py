@@ -14,3 +14,9 @@ class AdminActivateDepartmentSerializer(serializers.Serializer):
     department_code = serializers.CharField()
     department_name = serializers.CharField()
     otp = serializers.IntegerField()
+
+class AdminDeactivateDepartmentSerializer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    school_code = serializers.CharField()
+    department_name = serializers.CharField()
+    department_code = serializers.CharField()
