@@ -252,3 +252,6 @@ class AdminActivateSchoolDepartmentAPIView(APIView):
                 'status': False,
                 'message': 'Could not activate department!'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminDeactivateSchoolDepartmentAPIView(APIView):
+    pass
