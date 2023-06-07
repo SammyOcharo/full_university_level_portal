@@ -17,3 +17,14 @@ class SchoolFacultyDepartment(models.Model):
 
     def __str__(self):
         return self.department_name
+    
+class DepartmentActivationOtp(models.Model):
+    email = models.EmailField()
+    otp = models.IntegerField()
+    is_validated = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'department_activation_otp'
+
+    def __str__(self):
+        return self.email
