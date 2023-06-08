@@ -34,3 +34,7 @@ class AdminViewAllSchoolDepartmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolFacultyDepartment
         fields = '__all__'
+
+class AdminViewDepartmentsPerSchoolSerializer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    school_code = serializers.CharField()

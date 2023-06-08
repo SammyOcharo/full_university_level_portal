@@ -10,7 +10,7 @@ import uuid
 import re
 from portal_school_department_api.models import DepartmentActivationOtp, SchoolFacultyDepartment
 
-from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer, AdminDeleteSchoolDepartmentSerailizer, AdminViewAllSchoolDepartmentsSerializer
+from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer, AdminDeleteSchoolDepartmentSerailizer, AdminViewAllSchoolDepartmentsSerializer, AdminViewDepartmentsPerSchoolSerializer
 from portal_schools_api.models import FacultySchool
 from utils.email_service import admin_department_otp_activate
 
@@ -475,6 +475,85 @@ class AdminViewAllSchoolDepartmentsAPIView(APIView):
             all_departments = SchoolFacultyDepartment.objects.order_by('-id')
 
             serializer = self.serializer_class(all_departments, many=True)
+
+            return Response({
+                'status': True,
+                'message': serializer.data
+            }, status=status.HTTP_200_OK)
+        
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                    'status': False,
+                    'message': 'Could not list all departments'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminViewDepartmentsPerSchoolAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminViewDepartmentsPerSchoolSerializer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            admin_email = request.data.get('admin_email')
+            school_code = request.data.get('school_code')
+            
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, admin_email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(admin_email)
+            
+            user = User.objects.filter(email=admin_email)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = FacultySchool.objects.filter(school_code=school_code)
+
+            if not school.exists():
+                return Response({
+                    'status': False,
+                    'message': f'school does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = school.first()
+            
+            all_departments_per_school = SchoolFacultyDepartment.objects.filter(school=school)
+
+            serializer = AdminViewAllSchoolDepartmentsSerializer(all_departments_per_school, many=True)
 
             return Response({
                 'status': True,
