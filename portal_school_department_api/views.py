@@ -10,7 +10,7 @@ import uuid
 import re
 from portal_school_department_api.models import DepartmentActivationOtp, SchoolFacultyDepartment
 
-from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer
+from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer, AdminDeleteSchoolDepartmentSerailizer
 from portal_schools_api.models import FacultySchool
 from utils.email_service import admin_department_otp_activate
 
@@ -351,11 +351,108 @@ class AdminDeactivateSchoolDepartmentAPIView(APIView):
                 'message': f'{department_name} department deactivated!'
             }, status=status.HTTP_200_OK)
 
-
         except Exception as e:
             print(str(e))
 
             return Response({
                 'status': False,
                 'message': 'Could not deactivate department'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminDeleteSchoolDepartmentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeleteSchoolDepartmentSerailizer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            department_name = request.data.get('department_name')
+            admin_email = request.data.get('admin_email')
+            school_code = request.data.get('school_code')
+            department_code = request.data.get('department_code')
+
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, admin_email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(admin_email)
+            
+            user = User.objects.filter(email=admin_email)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = FacultySchool.objects.filter(school_code=school_code)
+
+            if not school.exists():
+                return Response({
+                    'status': False,
+                    'message': f'school does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = school.first()
+
+            school_department = SchoolFacultyDepartment.objects.filter(department_name=department_name, department_code=department_code)
+
+            print(department_code)
+
+            if not school_department.exists():
+                return Response({
+                    'status': False,
+                    'message': f'{department_name} department does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school_department=school_department.first()
+
+            
+            if  school_department.status == 1:
+                return Response({
+                    'status': False,
+                    'message': f'{department_name} is activate, deactivate before deleting'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            school_department.delete()
+            
+            print("school department deleted!")
+
+            return Response({
+                'status': True,
+                'message': f'{department_name} department deleted!'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not delete department!'
             }, status=status.HTTP_400_BAD_REQUEST)

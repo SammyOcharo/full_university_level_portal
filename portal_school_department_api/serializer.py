@@ -20,3 +20,9 @@ class AdminDeactivateDepartmentSerializer(serializers.Serializer):
     school_code = serializers.CharField()
     department_name = serializers.CharField()
     department_code = serializers.CharField()
+
+class AdminDeleteSchoolDepartmentSerailizer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    school_code = serializers.CharField()
+    department_name = serializers.CharField()
+    department_code = serializers.CharField()
