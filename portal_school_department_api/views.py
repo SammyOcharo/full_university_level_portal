@@ -10,7 +10,7 @@ import uuid
 import re
 from portal_school_department_api.models import DepartmentActivationOtp, SchoolFacultyDepartment
 
-from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer, AdminDeleteSchoolDepartmentSerailizer
+from portal_school_department_api.serializer import AdminActivateDepartmentSerializer, AdminCreateSchoolDepartmentSerializer, AdminDeactivateDepartmentSerializer, AdminDeleteSchoolDepartmentSerailizer, AdminViewAllSchoolDepartmentsSerializer
 from portal_schools_api.models import FacultySchool
 from utils.email_service import admin_department_otp_activate
 
@@ -456,3 +456,36 @@ class AdminDeleteSchoolDepartmentAPIView(APIView):
                 'status': False,
                 'message': 'Could not delete department!'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminViewAllSchoolDepartmentsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminViewAllSchoolDepartmentsSerializer
+
+    def get(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            all_departments = SchoolFacultyDepartment.objects.order_by('-id')
+
+            serializer = self.serializer_class(all_departments, many=True)
+
+            return Response({
+                'status': True,
+                'message': serializer.data
+            }, status=status.HTTP_200_OK)
+        
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                    'status': False,
+                    'message': 'Could not list all departments'
+                }, status=status.HTTP_400_BAD_REQUEST)
