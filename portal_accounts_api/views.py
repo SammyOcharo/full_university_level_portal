@@ -6,6 +6,7 @@ from rest_framework import status
 import re
 import uuid
 import random
+from portal_accounts_api.models import UniversityAccounts
 
 from portal_accounts_api.serializers import AdminCreateAccountsSerializer
 # Create your views here.
@@ -65,9 +66,9 @@ class AdminCreateAccountsAPIView(APIView):
                     'message': 'User does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
 
-            school_name = school_name.lower()
             
-            faculty_school = FacultySchool.objects.filter(school_name=school_name)
+            
+            faculty_school = UniversityAccounts.objects.filter(school_name=school_name)
 
             if not faculty_school.exists():
                 return Response({
