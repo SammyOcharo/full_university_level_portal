@@ -76,7 +76,7 @@ class AdminCreateStudent(APIView):
             user.save()
             
             student = Student.objects.create(user=user, student_name=full_name,national_id_number=id_number,  school=faculty_school_first, school_id_number=school_id_number, course=course)
-            student.add(department=school_department_name)
+            student.department.add(school_department.first().id)
             if not student:
                 return Response({
                     'status': False,
@@ -85,7 +85,7 @@ class AdminCreateStudent(APIView):
             
             return Response({
                 'status': True,
-                'message': f'{school_name} created successfully!'
+                'message': f'student {full_name} created successfully!'
             }, status=status.HTTP_200_OK)
 
 
