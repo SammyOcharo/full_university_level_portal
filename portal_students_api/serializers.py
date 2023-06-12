@@ -14,3 +14,4 @@ class AdminActivateStudentSerializer(serializers.Serializer):
     admin_email = serializers.EmailField()
     student_id = serializers.CharField()
     school_code = serializers.CharField()
+    otp = serializers.IntegerField()

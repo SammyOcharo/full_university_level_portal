@@ -21,3 +21,16 @@ class Student(models.Model):
     
     class Meta:
         db_table = 'student'
+
+
+
+class StudentActivationOtp(models.Model):
+    email = models.EmailField()
+    otp = models.IntegerField()
+    is_validated = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'student_activation_otp'
+
+    def __str__(self):
+        return self.email
