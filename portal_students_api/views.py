@@ -167,7 +167,19 @@ class AdminActivateStudentAPIView(APIView):
                     'message': f'school is deactivated you need to reactivate.'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            Student.objects.filter()
+            student = Student.objects.filter(school_id_number=student_id)
+
+            if not student.exists():
+                return Response({
+                    'status': False,
+                    'message': f'student not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            student = student.first()
+            student.status = 1
+            student.save()
+
+            print("student activated!")
             
             
             school.status=1
@@ -176,7 +188,7 @@ class AdminActivateStudentAPIView(APIView):
 
             return Response({
                 'status': True,
-                'message': f'{school_name} Activated!'
+                'message': f'student {student.student_name} Activated!'
             }, status=status.HTTP_200_OK)
         except Exception as e:
             print(str(e))
