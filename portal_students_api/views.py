@@ -454,7 +454,7 @@ class AdminDeactivateStudentAPIView(APIView):
             if  school.status == 2:
                 return Response({
                     'status': False,
-                    'message': f'school is already deactivated.'
+                    'message': f'school is deactivated.'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             student_queryset = Student.objects.filter(school_id_number=student_id)
@@ -466,6 +466,12 @@ class AdminDeactivateStudentAPIView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
             
             student=student_queryset.first()
+
+            if  student.status == 2:
+                return Response({
+                    'status': False,
+                    'message': f'{student.student_name} portal is already deactivated.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
    
             
