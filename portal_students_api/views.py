@@ -14,7 +14,7 @@ from portal_school_department_api.models import SchoolFacultyDepartment
 from portal_schools_api.models import FacultySchool
 from portal_students_api.models import Student, StudentActivationOtp
 
-from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminSuspendStudentSerializer
+from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminDeactivateStudentSerializer, AdminSuspendStudentSerializer
 # Create your views here.
 
 class AdminCreateStudent(APIView):
@@ -373,7 +373,7 @@ class AdminSuspendStudentAPIView(APIView):
             student.status = 3
             student.save()
 
-            print("student activated!")
+            print("student suspended!")
 
             return Response({
                 'status': True,
@@ -385,4 +385,104 @@ class AdminSuspendStudentAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Could not suspended student'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class AdminDeactivateStudentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeactivateStudentSerializer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            admin_email = request.data.get('admin_email')
+            student_id = request.data.get('student_id')
+            school_code = request.data.get('school_code')
+
+            
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, admin_email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(admin_email)
+            
+            user = User.objects.filter(email=admin_email)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = FacultySchool.objects.filter(school_code=school_code)
+
+            if not school.exists():
+                return Response({
+                    'status': False,
+                    'message': f'school does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            school = school.first()
+
+            if  school.status == 2:
+                return Response({
+                    'status': False,
+                    'message': f'school is already deactivated.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            student_queryset = Student.objects.filter(school_id_number=student_id)
+
+            if not student_queryset.exists():
+                return Response({
+                    'status': False,
+                    'message': f'student not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            student=student_queryset.first()
+
+   
+            
+       
+            student.status = 2
+            student.save()
+
+            print("student deactivated!")
+
+            return Response({
+                'status': True,
+                'message': f'student {student.student_name} Deactivated!'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not deactivate student'
             }, status=status.HTTP_400_BAD_REQUEST)

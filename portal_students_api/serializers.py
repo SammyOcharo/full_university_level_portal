@@ -20,3 +20,8 @@ class AdminSuspendStudentSerializer(serializers.Serializer):
     admin_email = serializers.EmailField()
     student_id = serializers.CharField()
     school_code = serializers.CharField()
+
+class AdminDeactivateStudentSerializer(serializers.Serializer):
+    admin_email = serializers.EmailField()
+    student_id = serializers.CharField()
+    school_code = serializers.CharField()
