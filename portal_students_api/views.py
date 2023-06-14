@@ -14,7 +14,7 @@ from portal_school_department_api.models import SchoolFacultyDepartment
 from portal_schools_api.models import FacultySchool
 from portal_students_api.models import Student, StudentActivationOtp
 
-from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminDeactivateStudentSerializer, AdminSuspendStudentSerializer
+from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminDeactivateStudentSerializer, AdminSuspendStudentSerializer, AdminViewAllStudentsSerializer
 # Create your views here.
 
 class AdminCreateStudent(APIView):
@@ -491,4 +491,20 @@ class AdminDeactivateStudentAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Could not deactivate student'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminViewAllStudentsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminViewAllStudentsSerializer
+
+    def get(self, request):
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not return list of students!'
             }, status=status.HTTP_400_BAD_REQUEST)

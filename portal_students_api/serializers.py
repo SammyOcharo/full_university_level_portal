@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from portal_students_api.models import Student
+
 class AdminCreateStudentStudentSErializer(serializers.Serializer):
     school_code = serializers.CharField()
     department_code = serializers.CharField()
@@ -25,3 +27,8 @@ class AdminDeactivateStudentSerializer(serializers.Serializer):
     admin_email = serializers.EmailField()
     student_id = serializers.CharField()
     school_code = serializers.CharField()
+
+class AdminViewAllStudentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
