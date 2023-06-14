@@ -499,7 +499,33 @@ class AdminViewAllStudentsAPIView(APIView):
 
     def get(self, request):
         try:
-            data = request.data
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = User.objects.filter(email=current_user)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            student = Student.objects.order_by('-id')
+
+            serializer = self.serializer_class(student, many=True)
+
+            return Response({
+                'status': True,
+                'list_students': serializer.data
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(str(e))
