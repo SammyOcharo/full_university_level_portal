@@ -540,4 +540,48 @@ class AdminSearchStudentAPIView(APIView):
     serializer_class = AdminViewAllStudentsSerializer
 
     def get(self, request):
-        pass
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = User.objects.filter(email=current_user)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            student_id = request.query_params.get('student_id')
+            student = Student.objects.filter(school_id_number=student_id)
+
+            if not student.exists():
+                return Response({
+                    'status': False,
+                    'message': 'student not found!'
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = self.serializer_class(student, many=True)
+
+            return Response({
+                'status': True,
+                'list_students': serializer.data
+            }, status=status.HTTP_200_OK)
+
+
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not retrive student details!'
+            }, status=status.HTTP_400_BAD_REQUEST)
