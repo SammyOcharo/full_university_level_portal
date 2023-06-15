@@ -48,3 +48,4 @@ class AdminViewAllStudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+
