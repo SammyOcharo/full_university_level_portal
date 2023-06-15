@@ -534,3 +534,10 @@ class AdminViewAllStudentsAPIView(APIView):
                 'status': False,
                 'message': 'Could not return list of students!'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminSearchStudentAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminViewAllStudentsSerializer
+
+    def get(self, request):
+        pass
