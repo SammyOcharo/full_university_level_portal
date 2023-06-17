@@ -66,6 +66,12 @@ class AdminCreateLibraryAdminAPIView(APIView):
                     'message': 'Invalid email provided'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
+            if User.objects.filter(email=library_admin_email).exists():
+                return Response({
+                    'status': False,
+                    'message': 'User already exist'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             role = 'library'
             role = Roles.objects.filter(short_name=role).first()
             
@@ -81,7 +87,7 @@ class AdminCreateLibraryAdminAPIView(APIView):
             #create otp for account activation
             otp = random.randint(111111, 999999)
 
-            if not LibraryAdminActivationOtp(email=library_admin_email, otp=otp):
+            if not LibraryAdminActivationOtp.objects.create(email=library_admin_email, otp=otp):
                 return Response({
                     'status': False,
                     'message': 'error saving otp!'
