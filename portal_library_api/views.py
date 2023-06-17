@@ -12,7 +12,7 @@ from portal_library_api.models import LibraryAdmin, LibraryAdminActivationOtp
 from utils.email_service import admin_library_admin_creation_email
 
 User = get_user_model()
-from portal_library_api.serializers import AdminCreateLibraryAdminSerializer
+from portal_library_api.serializers import AdminActivateLibraryAdminSerializer, AdminCreateLibraryAdminSerializer
 
 # Create your views here.
 
@@ -101,4 +101,98 @@ class AdminCreateLibraryAdminAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Could not add library admin'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminActivateLibraryAdminAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminActivateLibraryAdminSerializer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            library_admin_email = request.data.get('library_admin_email')
+            otp = request.data.get('otp')
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, library_admin_email)
+            
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(current_user)
+            
+            user = User.objects.filter(email=current_user)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            libary_admin = LibraryAdmin.objects.filter(email=library_admin_email)
+
+            if not libary_admin.exists():
+                return Response({
+                    'status': False,
+                    'message': f'{libary_admin} does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            libary_admin = libary_admin.first()
+
+            saved_otp = LibraryAdminActivationOtp.objects.filter(email=library_admin_email, is_validated=0)
+            if not saved_otp.exists():
+                return Response({
+                    'status': False,
+                    'message': f'otp does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            saved_otp = saved_otp.first()
+            if str(saved_otp.otp) != str(otp):
+                return Response({
+                    'status': False,
+                    'message': f'otp mismatch!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            saved_otp.otp = 1
+            saved_otp.save()
+
+            libary_admin.status = 1
+            libary_admin.save()
+            
+            print("library admin account Activated!")
+
+            return Response({
+                'status': True,
+                'message': f'library admin with email {libary_admin} Activated!'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not deactivate school!'
             }, status=status.HTTP_400_BAD_REQUEST)

@@ -170,7 +170,7 @@ class AdminActivateSchoolAPIView(APIView):
 
             return Response({
                 'status': False,
-                'message': 'Could not deactivate schhol!'
+                'message': 'Could not deactivate school!'
             }, status=status.HTTP_400_BAD_REQUEST)
         
 class AdminDeactivateSchoolAPIView(APIView):

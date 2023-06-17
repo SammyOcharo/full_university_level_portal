@@ -6,3 +6,6 @@ class AdminCreateLibraryAdminSerializer(serializers.Serializer):
     mobile_number = serializers.CharField()
     school_id_number = serializers.CharField()
     full_name = serializers.CharField()
+
+class AdminActivateLibraryAdminSerializer(serializers.Serializer):
+    library_admin_email = serializers.EmailField()
