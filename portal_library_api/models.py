@@ -11,6 +11,7 @@ class LibraryAdmin(models.Model):
     id_number = models.CharField(max_length=12)
     mobile_number = models.CharField(max_length=15)
     school_id_number = models.CharField(max_length=15)
+    status = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'library_admin'
