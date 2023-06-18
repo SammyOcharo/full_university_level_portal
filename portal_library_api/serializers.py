@@ -9,3 +9,9 @@ class AdminCreateLibraryAdminSerializer(serializers.Serializer):
 
 class AdminActivateLibraryAdminSerializer(serializers.Serializer):
     library_admin_email = serializers.EmailField()
+
+
+class AddBooksSerializer(serializers.Serializer):
+    book_name = serializers.CharField()
+    book_category = serializers.CharField()
+    
