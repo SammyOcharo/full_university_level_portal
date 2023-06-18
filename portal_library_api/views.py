@@ -8,11 +8,11 @@ from rest_framework import status
 
 from django.contrib.auth import get_user_model
 from portal_authentication.models import Roles
-from portal_library_api.models import LibraryAdmin, LibraryAdminActivationOtp
+from portal_library_api.models import LibraryAdmin, LibraryAdminActivationOtp, LibraryBooks
 from utils.email_service import admin_library_admin_creation_email
 
 User = get_user_model()
-from portal_library_api.serializers import AdminActivateLibraryAdminSerializer, AdminCreateLibraryAdminSerializer
+from portal_library_api.serializers import AddBooksSerializer, AdminActivateLibraryAdminSerializer, AdminCreateLibraryAdminSerializer
 
 # Create your views here.
 
@@ -202,3 +202,56 @@ class AdminActivateLibraryAdminAPIView(APIView):
                 'status': False,
                 'message': 'Could not deactivate school!'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminAddBooksAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddBooksSerializer
+
+    def post(self, request):
+        try:
+            data = request.data
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            book_name = request.data.get('book_name')
+            book_category = request.data.get('book_category')
+
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            admin_user = User.objects.filter(email=current_user)
+
+            print(admin_user)
+            
+            if not admin_user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            LibraryBooks.objects.create(book_name=book_name, book_category=book_category)
+
+            return Response({
+                    'status': False,
+                    'message': 'Book added successfully!'
+                }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not add book!'
+            }, status=status.HTTP_404_NOT_FOUND)
