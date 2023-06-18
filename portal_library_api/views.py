@@ -241,6 +241,12 @@ class AdminAddBooksAPIView(APIView):
                     'message': 'User does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
             
+            if LibraryBooks.objects.filter(book_name=book_name).exists():
+                return Response({
+                    'status': False,
+                    'message': 'Book already exists! '
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             LibraryBooks.objects.create(book_name=book_name, book_category=book_category)
 
             return Response({
