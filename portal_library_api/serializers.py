@@ -12,6 +12,15 @@ class AdminActivateLibraryAdminSerializer(serializers.Serializer):
 
 
 class AddBooksSerializer(serializers.Serializer):
-    book_name = serializers.CharField()
-    book_category = serializers.CharField()
+    Title = serializers.CharField()
+    Author = serializers.CharField()
+    ISBN = serializers.CharField()
+    Language = serializers.CharField()
+    Description = serializers.CharField()
+    Number_of_Pages = serializers.CharField()
+    Location = serializers.CharField()
+    Publisher = serializers.CharField()
+    genre = serializers.CharField()
+    Cover_Image = serializers.ImageField()
+    Publication_Date = serializers.DateField()
     
