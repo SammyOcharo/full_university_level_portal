@@ -2,6 +2,7 @@ from django.db import models
 
 
 from django.contrib.auth import get_user_model
+from .books_genre import choices
 
 User = get_user_model()
 
@@ -31,11 +32,38 @@ class LibraryAdminActivationOtp(models.Model):
     def __str__(self):
         return self.email
     
+class Genre(models.Model):
+    name = models.CharField(max_length=50, choices=choices)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+    
 
 class LibraryBooks(models.Model):
-    book_name = models.CharField(max_length=30)
+    Title = models.CharField(max_length=30)
+    Author = models.CharField(max_length=30)
+    Publication_Date = models.DateField()
+    ISBN = models.CharField(max_length=50)
+    Description = models.TextField()
+    Publisher = models.CharField(max_length=60)
+    Genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True)
+    Language = models.CharField(max_length=60)
+    Cover_Image = models.ImageField()
+    Number_of_Pages = models.CharField(max_length=60)
+    Availability = models.IntegerField(default=0)
+    Location = models.CharField(max_length=60)
+    Borrower = models.CharField(max_length=60)
+    Due_Date = models.DateField()
     book_category = models.CharField(max_length=100)
 
 
+
     def __str__(self) -> str:
-        return self.book_name
+        return self.Title
+    
+    class Meta:
+        verbose_name = 'library_books'
+        verbose_name_plural = 'library_books'
+        ordering = ['-id']
+        db_table = 'library_books'
