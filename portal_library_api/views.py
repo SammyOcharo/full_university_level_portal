@@ -1,6 +1,6 @@
 import random
 import re
-from django.shortcuts import render
+from datetime import date
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from rest_framework import status
 
 from django.contrib.auth import get_user_model
 from portal_authentication.models import Roles
-from portal_library_api.models import LibraryAdmin, LibraryAdminActivationOtp, LibraryBooks
+from portal_library_api.models import Genre, LibraryAdmin, LibraryAdminActivationOtp, LibraryBooks
 from utils.email_service import admin_library_admin_creation_email
 
 User = get_user_model()
@@ -219,8 +219,30 @@ class AdminAddBooksAPIView(APIView):
                     'errors': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            book_name = request.data.get('book_name')
-            book_category = request.data.get('book_category')
+            Title = request.data.get('Title')
+            Author = request.data.get('Author')
+            ISBN = request.data.get('ISBN')
+            Language = request.data.get('Language')
+            Description = request.data.get('Description')
+            Number_of_Pages = request.data.get('Number_of_Pages')
+            Location = request.data.get('Location')
+            Publisher = request.data.get('Publisher')
+            genre = request.data.get('genre')
+            Cover_Image = request.data.get('Cover_Image')
+            Publication_Date = request.data.get('Publication_Date')
+
+            genre =genre.lower()
+            genre = Genre.objects.filter(name=genre)
+            print(genre)
+
+            if not genre.exists():
+                return Response({
+                    'status': False,
+                    'message': 'Genre does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            genre = genre.first()
+            
 
             current_user = request.user
             allowed_roles = ['admin']
@@ -241,13 +263,17 @@ class AdminAddBooksAPIView(APIView):
                     'message': 'User does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
             
-            if LibraryBooks.objects.filter(book_name=book_name).exists():
+            if LibraryBooks.objects.filter(Title=Title).exists():
                 return Response({
                     'status': False,
                     'message': 'Book already exists! '
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # LibraryBooks.objects.create(book_name=book_name, book_category=book_category)
+            
+            LibraryBooks.objects.create(Title=Title, Author=Author,Publication_Date=Publication_Date,
+                                        ISBN=ISBN, Description=Description, Publisher=Publisher, 
+                                        Language=Language, Genre=genre,Cover_Image=Cover_Image, 
+                                        Number_of_Pages=Number_of_Pages, Location=Location)
 
             return Response({
                     'status': False,

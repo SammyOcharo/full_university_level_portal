@@ -53,9 +53,9 @@ class LibraryBooks(models.Model):
     Number_of_Pages = models.CharField(max_length=60)
     Availability = models.IntegerField(default=0)
     Location = models.CharField(max_length=60)
-    Borrower = models.CharField(max_length=60)
-    Due_Date = models.DateField()
-    book_category = models.CharField(max_length=100)
+    Borrower = models.ForeignKey(User,max_length=60, null=True, on_delete=models.DO_NOTHING)
+    Borrow_date = models.DateField(null=True)
+    Due_Date = models.DateField(null=True)
 
 
 
