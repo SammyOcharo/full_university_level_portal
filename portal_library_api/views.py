@@ -247,7 +247,7 @@ class AdminAddBooksAPIView(APIView):
                     'message': 'Book already exists! '
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            LibraryBooks.objects.create(book_name=book_name, book_category=book_category)
+            # LibraryBooks.objects.create(book_name=book_name, book_category=book_category)
 
             return Response({
                     'status': False,
