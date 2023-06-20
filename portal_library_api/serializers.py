@@ -23,4 +23,5 @@ class AddBooksSerializer(serializers.Serializer):
     genre = serializers.CharField()
     Cover_Image = serializers.ImageField()
     Publication_Date = serializers.DateField()
-    
+
+
