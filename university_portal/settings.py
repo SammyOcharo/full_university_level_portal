@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'portal_schools_api.apps.PortalSchoolsApiConfig',
     'portal_authentication.apps.PortalAuthenticationConfig',
     'portal_school_department_api.apps.PortalSchoolDepartmentApiConfig',
+    'portal_security_api.apps.PortalSecurityApiConfig',
     'rest_framework',
     'rest_framework_simplejwt',
 
