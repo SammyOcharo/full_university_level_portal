@@ -16,3 +16,16 @@ class EntryLog(models.Model):
 
     def __str__(self) -> str:
         return self.student.student_name
+    
+class SecurityDetails(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    employee_id = models.CharField(max_length=50)
+    employee_photo = models.ImageField()
+
+    class Meta:
+        db_table = 'security_details'
+        verbose_name_plural = 'security_details'
+
+    def __str__(self) -> str:
+        return self.first_name
