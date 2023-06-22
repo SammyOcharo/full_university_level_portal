@@ -1,5 +1,5 @@
 from django.urls import path
-
+from . import views
 urlpatterns = [
-    path()
+    path("admin-create-security-admin/", views.AdminCreateSecurityAdminAPIView.as_view(), name='admin-create-security-admin-api')
 ]
