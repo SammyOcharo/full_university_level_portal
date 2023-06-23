@@ -34,6 +34,7 @@ class SecurityDetails(models.Model):
     last_name = models.CharField(max_length=30)
     employee_id = models.CharField(max_length=50)
     employee_photo = models.ImageField()
+    status = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'security_details'
