@@ -26,4 +26,5 @@ urlpatterns = [
     path('apps/admin/v1/students/', include('portal_students_api.urls')),
     path('apps/admin/v1/departments/', include('portal_school_department_api.urls')),
     path('apps/admin/v1/library/', include('portal_library_api.urls')),
+    path('apps/admin/v1/security/', include('portal_security_api.urls')),
 ]
