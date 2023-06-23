@@ -85,3 +85,6 @@ class AdminCreateSecurityAdminAPIView(APIView):
                 'status': False,
                 'message': 'Error creating security admin!'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminApproveSecurityAdminAPIView(APIView):
+    pass
