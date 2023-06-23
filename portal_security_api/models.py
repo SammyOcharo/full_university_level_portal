@@ -1,8 +1,19 @@
 from django.db import models
+from portal_security_api.choices import USER_ROLES
 
 from portal_students_api.models import Student
 
 # Create your models here.
+class Roles(models.Model):
+    name = models.CharField(max_length=20, null=False)
+    short_name = models.CharField(choices=USER_ROLES, default='', max_length=20, unique=True, blank=False)
+    is_active = models.IntegerField(default=0)
+
+    def __str__(self) -> str:
+        return self.short_name
+    
+    class Meta:
+        verbose_name_plural = 'security_roles'
 
 class EntryLog(models.Model):
     student =  models.ForeignKey(Student, on_delete=models.DO_NOTHING)
@@ -18,6 +29,7 @@ class EntryLog(models.Model):
         return self.student.student_name
     
 class SecurityDetails(models.Model):
+    role = models.ForeignKey(Roles, on_delete=models.DO_NOTHING)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     employee_id = models.CharField(max_length=50)
