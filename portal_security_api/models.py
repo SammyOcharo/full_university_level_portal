@@ -29,6 +29,7 @@ class EntryLog(models.Model):
         return self.student.student_name
     
 class SecurityDetails(models.Model):
+    email = models.EmailField()
     role = models.ForeignKey(Roles, on_delete=models.DO_NOTHING)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -42,3 +43,15 @@ class SecurityDetails(models.Model):
 
     def __str__(self) -> str:
         return self.first_name
+    
+
+class SecurityAdminActivationOtp(models.Model):
+    email = models.EmailField()
+    otp = models.IntegerField()
+    is_validated = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'security_admin_activation_otp'
+
+    def __str__(self):
+        return self.email
