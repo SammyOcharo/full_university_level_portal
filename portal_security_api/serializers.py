@@ -11,3 +11,7 @@ class AdminCreateSecurityAdminSerializer(serializers.Serializer):
 class AdminApproveSecuritySerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.IntegerField()
+
+class AdminSuspendSecurityAdminSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
