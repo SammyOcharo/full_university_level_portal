@@ -13,7 +13,7 @@ from utils.email_service import admin_security_admin_creation_email
 
 User = get_user_model()
 
-from portal_security_api.serializers import AdminApproveSecuritySerializer, AdminCreateSecurityAdminSerializer
+from portal_security_api.serializers import AdminApproveSecuritySerializer, AdminCreateSecurityAdminSerializer, AdminSuspendSecurityAdminSerializer
 
 class AdminCreateSecurityAdminAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -207,3 +207,73 @@ class AdminApproveSecurityAdminAPIView(APIView):
                 'status': False,
                 'message': 'Could not approve security admin.'
             }, status=status.HTTP_200_OK)
+        
+class AdminSuspendSecurityAdminAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminSuspendSecurityAdminSerializer 
+
+    def post(self, request):
+        current_user = request.user
+        allowed_roles = ['admin']
+
+        if not current_user.role.short_name in allowed_roles:
+            return Response({
+                'status': False,
+                'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = request.data
+
+        serializer = self.serializer_class(data=data)
+
+        if not serializer.is_valid():
+            return Response({
+                'status': False,
+                'message': 'Invalid data provided!',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        email = request.data.get('email')
+
+
+        email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        valid_email = re.fullmatch(email_regex, email)
+
+        if not valid_email:
+            return Response({
+                'status': False,
+                'message': 'Invalid email provided'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        security_admin = SecurityDetails.objects.filter(email=email)
+
+        if not security_admin.exists():
+            return Response({
+                'status': False,
+                'message': ' security admin does not exist'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        security_admin=security_admin.first()
+
+        if  security_admin.status == 2:
+            return Response({
+                'status': False,
+                'message': f'security admin with first name {security_admin} is already suspended.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        security_admin.status = 2
+        security_admin.save()
+
+        print("security admin suspended successfully")
+        return Response({
+            'status': False,
+            'message': 'Security admin suspended!'
+        }, status=status.HTTP_200_OK)
+
+class AdminDeactivateSecurityAdminAPIView(APIView):
+    pass 
+
+class AdminReactivateSecurityAdminAPIView(APIView):
+    pass
