@@ -13,7 +13,7 @@ from utils.email_service import admin_security_admin_creation_email
 
 User = get_user_model()
 
-from portal_security_api.serializers import AdminApproveSecuritySerializer, AdminCreateSecurityAdminSerializer, AdminSuspendSecurityAdminSerializer
+from portal_security_api.serializers import AdminApproveSecuritySerializer, AdminCreateSecurityAdminSerializer, AdminDeleteSecurityAdminSerializer, AdminSuspendSecurityAdminSerializer
 
 class AdminCreateSecurityAdminAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -421,4 +421,60 @@ class AdminReactivateSecurityAdminAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'unable to reactivate security admin!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class AdminDeleteSecurityAdminAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeleteSecurityAdminSerializer 
+
+    def post(self, request):
+        try:
+
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            id = request.data.get('id')
+
+
+            
+            
+            security_admin = SecurityDetails.objects.filter(id=id)
+
+            if not security_admin.exists():
+                return Response({
+                    'status': False,
+                    'message': ' security admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            security_admin=security_admin.first()
+
+            security_admin.delete()
+
+            print("security admin deleted successfully")
+            return Response({
+                'status': True,
+                'message': 'Security admin deleted!'
+            }, status=status.HTTP_200_OK) 
+        except Exception as e:
+            return Response({
+                'status': False,
+                'message': 'unable to delete security admin!'
             }, status=status.HTTP_400_BAD_REQUEST)
