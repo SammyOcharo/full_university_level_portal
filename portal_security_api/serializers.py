@@ -14,4 +14,6 @@ class AdminApproveSecuritySerializer(serializers.Serializer):
 
 class AdminSuspendSecurityAdminSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    
+
+class AdminDeleteSecurityAdminSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
