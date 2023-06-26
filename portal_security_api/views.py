@@ -213,67 +213,212 @@ class AdminSuspendSecurityAdminAPIView(APIView):
     serializer_class = AdminSuspendSecurityAdminSerializer 
 
     def post(self, request):
-        current_user = request.user
-        allowed_roles = ['admin']
+        try:
 
-        if not current_user.role.short_name in allowed_roles:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            email = request.data.get('email')
+
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            security_admin = SecurityDetails.objects.filter(email=email)
+
+            if not security_admin.exists():
+                return Response({
+                    'status': False,
+                    'message': ' security admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            security_admin=security_admin.first()
+
+            if  security_admin.status == 2:
+                return Response({
+                    'status': False,
+                    'message': f'security admin with first name {security_admin} is already suspended.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            security_admin.status = 2
+            security_admin.save()
+
+            print("security admin suspended successfully")
+            return Response({
+                'status': True,
+                'message': 'Security admin suspended!'
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
             return Response({
                 'status': False,
-                'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                'message': 'unable to suspend security admin!'
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        data = request.data
 
-        serializer = self.serializer_class(data=data)
-
-        if not serializer.is_valid():
-            return Response({
-                'status': False,
-                'message': 'Invalid data provided!',
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        email = request.data.get('email')
-
-
-        email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        valid_email = re.fullmatch(email_regex, email)
-
-        if not valid_email:
-            return Response({
-                'status': False,
-                'message': 'Invalid email provided'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-        security_admin = SecurityDetails.objects.filter(email=email)
-
-        if not security_admin.exists():
-            return Response({
-                'status': False,
-                'message': ' security admin does not exist'
-            }, status=status.HTTP_404_NOT_FOUND)
-        
-        security_admin=security_admin.first()
-
-        if  security_admin.status == 2:
-            return Response({
-                'status': False,
-                'message': f'security admin with first name {security_admin} is already suspended.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-
-        security_admin.status = 2
-        security_admin.save()
-
-        print("security admin suspended successfully")
-        return Response({
-            'status': False,
-            'message': 'Security admin suspended!'
-        }, status=status.HTTP_200_OK)
 
 class AdminDeactivateSecurityAdminAPIView(APIView):
-    pass 
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminSuspendSecurityAdminSerializer 
+
+    def post(self, request):
+        try:
+
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            email = request.data.get('email')
+
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            security_admin = SecurityDetails.objects.filter(email=email)
+
+            if not security_admin.exists():
+                return Response({
+                    'status': False,
+                    'message': ' security admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            security_admin=security_admin.first()
+
+            if  security_admin.status == 3:
+                return Response({
+                    'status': False,
+                    'message': f'security admin with first name {security_admin} is already deactivated.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            security_admin.status = 3
+            security_admin.save()
+
+            print("security admin deactivated successfully")
+            return Response({
+                'status': True,
+                'message': 'Security admin deactivated!'
+            }, status=status.HTTP_200_OK) 
+        except Exception as e:
+            return Response({
+                'status': False,
+                'message': 'unable to deactivate security admin!'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class AdminReactivateSecurityAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminSuspendSecurityAdminSerializer 
+
+    def post(self, request):
+        try:
+
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            email = request.data.get('email')
+
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+            security_admin = SecurityDetails.objects.filter(email=email)
+
+            if not security_admin.exists():
+                return Response({
+                    'status': False,
+                    'message': ' security admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            security_admin=security_admin.first()
+
+            if  security_admin.status == 1:
+                return Response({
+                    'status': False,
+                    'message': f'security admin with first name {security_admin} is already reactivated.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            security_admin.status = 1
+            security_admin.save()
+
+            print("security admin reactivated successfully")
+            return Response({
+                'status': True,
+                'message': 'Security admin reactivated!'
+            }, status=status.HTTP_200_OK) 
+        except Exception as e:
+            return Response({
+                'status': False,
+                'message': 'unable to reactivate security admin!'
+            }, status=status.HTTP_400_BAD_REQUEST)

@@ -178,7 +178,7 @@ def admin_library_admin_creation_email(email, otp, library_admin_email):
 def admin_security_admin_creation_email(email, otp, security_admin_email):
 
     try:
-        email_subject = 'Library Admin Activation OTP'
+        email_subject = 'Security Admin Activation OTP'
         SYSTEM_EMAIL = settings.EMAIL_HOST_USER
         to = email
         message = f'Dear Admin, you iniatited a creation of security admin using email {security_admin_email}, use otp {otp} to complete your request to activate account.' 
