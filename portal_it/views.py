@@ -1,21 +1,34 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+from portal_it.serializers import AdminApproveITAdminSerializer, AdminCreateITAdminSerializer, AdminDeactivateITAdminSerializer, AdminDeleteITAdminSerializer, AdminReactivateITAdminSerializer, AdminSuspendITAdminSerializer
+
 
 class AdminCreateITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminCreateITAdminSerializer
 
 class AdminApproveITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminApproveITAdminSerializer
+
 
 class AdminSuspendITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminSuspendITAdminSerializer
+
 
 class AdminDeactivateITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeactivateITAdminSerializer
+
 
 class AdminReactivateITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminReactivateITAdminSerializer
+
+
 
 class AdminDeleteITAdminAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminDeleteITAdminSerializer
