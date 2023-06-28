@@ -1,5 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 from portal_it.serializers import AdminApproveITAdminSerializer, AdminCreateITAdminSerializer, AdminDeactivateITAdminSerializer, AdminDeleteITAdminSerializer, AdminReactivateITAdminSerializer, AdminSuspendITAdminSerializer
 
@@ -11,6 +13,14 @@ class AdminCreateITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
@@ -22,6 +32,13 @@ class AdminApproveITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
@@ -34,6 +51,13 @@ class AdminSuspendITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
@@ -46,6 +70,13 @@ class AdminDeactivateITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
@@ -58,6 +89,13 @@ class AdminReactivateITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
@@ -71,6 +109,13 @@ class AdminDeleteITAdminAPIView(APIView):
     def post(self, request):
         try:
             data = request.data
+            serializer = self.serializer_class(data=data)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'error': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             print(str(e))
