@@ -9,14 +9,22 @@ class AdminCreateITAdminAPIView(APIView):
     serializer_class = AdminCreateITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
 
 class AdminApproveITAdminAPIView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AdminApproveITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
 
 
 class AdminSuspendITAdminAPIView(APIView):
@@ -24,7 +32,11 @@ class AdminSuspendITAdminAPIView(APIView):
     serializer_class = AdminSuspendITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
 
 
 class AdminDeactivateITAdminAPIView(APIView):
@@ -32,7 +44,11 @@ class AdminDeactivateITAdminAPIView(APIView):
     serializer_class = AdminDeactivateITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
 
 
 class AdminReactivateITAdminAPIView(APIView):
@@ -40,7 +56,11 @@ class AdminReactivateITAdminAPIView(APIView):
     serializer_class = AdminReactivateITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
 
 
 
@@ -49,4 +69,8 @@ class AdminDeleteITAdminAPIView(APIView):
     serializer_class = AdminDeleteITAdminSerializer
 
     def post(self, request):
-        pass
+        try:
+            data = request.data
+
+        except Exception as e:
+            print(str(e))
