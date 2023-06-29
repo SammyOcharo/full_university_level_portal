@@ -9,7 +9,7 @@ class ITAdmin(models.Model):
     full_name = models.CharField(max_length=30)
     school_id_number = models.CharField(max_length=10)
     email = models.EmailField()
-    status = models.IntegerField()
+    status = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'it_admin'
