@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
 class AdminCreateITAdminSerializer(serializers.Serializer):
-    pass
+    id_number = serializers.CharField()
+    full_name = serializers.CharField()
+    email = serializers.EmailField()
+    mobile_number = serializers.CharField()
+    role = serializers.CharField()
 
 class AdminApproveITAdminSerializer(serializers.Serializer):
     pass
