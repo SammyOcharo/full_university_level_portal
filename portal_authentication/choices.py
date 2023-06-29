@@ -4,4 +4,5 @@ USER_ROLES = (
     ('students', 'students'),
     ('schools', 'schools'),
     ('library', 'library'),
+    ('it_admin', 'it_admin')
 )
