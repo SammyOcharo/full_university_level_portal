@@ -41,8 +41,8 @@ class AdminCreateITAdminAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             id_number = request.data.get('id_number')
-            full_name = request.data.get('id_number')
-            email = request.data.get('id_number')
+            full_name = request.data.get('full_name')
+            email = request.data.get('email')
             mobile_number = request.data.get('mobile_number')
             role = request.data.get('role')
 
@@ -78,9 +78,11 @@ class AdminCreateITAdminAPIView(APIView):
                     'message': 'Role provided does not exist!'
                 }, status=status.HTTP_404_NOT_FOUND)
             
+            role = role.first()
+            
             user = User(
                 email = email,
-                mobile_numer = mobile_number,
+                mobile_number = mobile_number,
                 id_number=id_number,
                 username = email,
                 role = role,
