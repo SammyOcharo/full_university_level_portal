@@ -165,7 +165,7 @@ class AdminApproveITAdminAPIView(APIView):
             if not it_user.exists():
                 return Response({
                     'status': False,
-                    'message': 'security admin does not exist'
+                    'message': 'it admin does not exist'
                 }, status=status.HTTP_404_NOT_FOUND)
             
             it_user = it_user.first()
@@ -173,7 +173,7 @@ class AdminApproveITAdminAPIView(APIView):
             if  it_user.status == 2:
                 return Response({
                     'status': False,
-                    'message': f'security admin{it_user.full_name} is deactivated you need to reactivate.'
+                    'message': f'it admin{it_user.full_name} is deactivated you need to reactivate.'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
 
@@ -215,7 +215,7 @@ class AdminApproveITAdminAPIView(APIView):
             print(str(e))
             return Response({
                 'status': False,
-                'message': 'Could not approve security admin.'
+                'message': 'Could not approve it admin.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
