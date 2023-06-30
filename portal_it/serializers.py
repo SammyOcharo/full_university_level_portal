@@ -8,7 +8,8 @@ class AdminCreateITAdminSerializer(serializers.Serializer):
     role = serializers.CharField()
 
 class AdminApproveITAdminSerializer(serializers.Serializer):
-    pass
+    email = serializers.EmailField()
+    otp = serializers.IntegerField()
 
 class AdminSuspendITAdminSerializer(serializers.Serializer):
     pass

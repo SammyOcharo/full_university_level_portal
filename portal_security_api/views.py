@@ -206,7 +206,7 @@ class AdminApproveSecurityAdminAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Could not approve security admin.'
-            }, status=status.HTTP_200_OK)
+            }, status=status.HTTP_400_BAD_REQUEST)
         
 class AdminSuspendSecurityAdminAPIView(APIView):
     permission_classes = [IsAuthenticated]
