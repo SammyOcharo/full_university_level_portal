@@ -310,6 +310,7 @@ class AdminDeactivateITAdminAPIView(APIView):
 
     def post(self, request):
         try:
+            current_user = request.user
             data = request.data
             serializer = self.serializer_class(data=data)
             if not serializer.is_valid():
@@ -318,9 +319,67 @@ class AdminDeactivateITAdminAPIView(APIView):
                     'message': 'Invalid data provided!',
                     'error': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(current_user)
+            
+            user = User.objects.filter(email=current_user)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            email = request.data.get('email')
+    
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(email)
+            
+            it_user = ITAdmin.objects.filter(email=email)
+
+            print(it_user)
+
+            if not it_user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'it admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            it_user = it_user.first()
+
+            if  it_user.status == 3:
+                return Response({
+                    'status': False,
+                    'message': f'it admin{it_user.full_name} is already deactivated'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            it_user.status = 3
+            it_user.save()
+            print("it admin deactivated!")
+
+            return Response({
+                'status': True,
+                'message': f' it admin with first name {it_user.full_name} and email {it_user.email} is Deactivated!'
+            }, status=status.HTTP_200_OK)
+
 
         except Exception as e:
             print(str(e))
+            return Response({
+                'status': False,
+                'message': 'Could not deactivated it admin.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminReactivateITAdminAPIView(APIView):
