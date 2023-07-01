@@ -12,7 +12,7 @@ class AdminApproveITAdminSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
 
 class AdminSuspendITAdminSerializer(serializers.Serializer):
-    pass
+    email = serializers.EmailField()
 
 class AdminDeactivateITAdminSerializer(serializers.Serializer):
     pass
