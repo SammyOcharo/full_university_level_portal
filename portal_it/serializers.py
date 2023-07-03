@@ -18,7 +18,8 @@ class AdminDeactivateITAdminSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 class AdminReactivateITAdminSerializer(serializers.Serializer):
-    pass
+    email = serializers.EmailField()
+
 
 class AdminDeleteITAdminSerializer(serializers.Serializer):
-    pass
+    email = serializers.EmailField()
