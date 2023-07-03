@@ -476,6 +476,44 @@ class AdminDeleteITAdminAPIView(APIView):
                     'message': 'Invalid data provided!',
                     'error': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
+            
+            email = request.data.get('email')
+    
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, email)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(email)
+            
+            it_user = ITAdmin.objects.filter(email=email)
+
+            print(it_user)
+
+            if not it_user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'it admin does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            it_user = it_user.first()
+            it_user.delete()
+
+            print("it admin deleted!")
+
+            return Response({
+                'status': True,
+                'message': f' it admin with first name {it_user.full_name} and email {it_user.email} is deleted!'
+            }, status=status.HTTP_200_OK)
+
 
         except Exception as e:
             print(str(e))
+            return Response({
+                'status': False,
+                'message': 'Could not delete it admin.'
+            }, status=status.HTTP_400_BAD_REQUEST)
