@@ -52,6 +52,7 @@ class AdminLoginAPIView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
             
             user = user.first()
+            print('password', user.password)
 
             allowed_roles = ['admin']
 
