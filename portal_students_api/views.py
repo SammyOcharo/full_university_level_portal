@@ -96,7 +96,8 @@ class AdminCreateStudent(APIView):
 
             password = get_student_password(full_name)
 
-            user = User(email=email, mobile_number=mobile_number, id_number=id_number, username=email, role=role, full_name=full_name, password=password)
+            user = User(email=email, mobile_number=mobile_number, id_number=id_number, username=email, role=role, full_name=full_name)
+            user.set_password(password)
 
             user.save()
             
@@ -268,6 +269,9 @@ class AdminActivateStudentAPIView(APIView):
 
        
             student.status = 1
+            student_user = User.objects.filter(email=student.user.email).first()
+            student_user.status = 1
+            student_user.save()
             student.save()
             db_saved_otp.is_validated=1
             db_saved_otp.save()
