@@ -14,6 +14,7 @@ class Roles(models.Model):
     
     class Meta:
         verbose_name_plural = 'roles'
+        db_table = 'roles'
 
 
 class User(AbstractUser):
