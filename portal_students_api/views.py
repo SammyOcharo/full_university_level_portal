@@ -7,7 +7,8 @@ from rest_framework import status
 
 from django.contrib.auth import get_user_model
 
-from utils.email_service import admin_student_otp_activate
+from utils.email_service import admin_student_otp_activate, student_password_details
+from utils.student_password import get_student_password
 User = get_user_model()
 from portal_authentication.models import Roles
 from portal_school_department_api.models import SchoolFacultyDepartment
@@ -93,7 +94,9 @@ class AdminCreateStudent(APIView):
             
             role = role.first()
 
-            user = User(email=email, mobile_number=mobile_number, id_number=id_number, username=email, role=role, full_name=full_name)
+            password = get_student_password(full_name)
+
+            user = User(email=email, mobile_number=mobile_number, id_number=id_number, username=email, role=role, full_name=full_name, password=password)
 
             user.save()
             
@@ -117,6 +120,12 @@ class AdminCreateStudent(APIView):
                 return Response({
                     'status': False,
                     'message': f'error sending email'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            if not student_password_details(email=email, password=password):
+                return Response({
+                    'status': False,
+                    'message': f'error sending email to student'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             return Response({
