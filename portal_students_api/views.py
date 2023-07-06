@@ -122,6 +122,7 @@ class AdminCreateStudent(APIView):
                     'message': f'error sending email'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
+            #send email with creds to the student
             if not student_password_details(email=email, password=password):
                 return Response({
                     'status': False,
