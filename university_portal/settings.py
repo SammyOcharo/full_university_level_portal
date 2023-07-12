@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'portal_it.apps.PortalItConfig',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
 
 ]
