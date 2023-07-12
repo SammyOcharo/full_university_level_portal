@@ -50,7 +50,21 @@ class StudentActivationOtp(models.Model):
         return self.email
     
 
-# Unit Information:
+# Unit Information
+class CourseUnits(models.Model):
+    unit_name = models.CharField(max_length=100)
+    unit_code = models.CharField(max_length=100)
+    unit_description = models.CharField(max_length=100)
+    unit_instructor = models.CharField(max_length=100)
+    unit_schedule = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'course_unit'
+
+    def __str__(self):
+        return self.unit_name
+    
+    
 # Enrollment Management
 # Grading and Assessment
 # Attendance Tracking
