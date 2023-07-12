@@ -18,6 +18,20 @@ class StudentCourseInformation(models.Model):
 
     def __str__(self):
         return self.course_name
+    
+# Unit Information
+class CourseUnits(models.Model):
+    unit_name = models.CharField(max_length=100)
+    unit_code = models.CharField(max_length=100)
+    unit_description = models.CharField(max_length=100)
+    unit_instructor = models.CharField(max_length=100)
+    unit_schedule = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'course_unit'
+
+    def __str__(self):
+        return self.unit_name
 
 # Create your models here.
 class Student(models.Model):
@@ -29,6 +43,7 @@ class Student(models.Model):
     school_id_number = models.CharField(max_length=10)
     course = models.ForeignKey(StudentCourseInformation, on_delete=models.DO_NOTHING)
     status = models.IntegerField(default=0)
+    units = models.ManyToManyField(CourseUnits, related_name='students')
 
     def __str__(self) -> str:
         return self.student_name
@@ -50,21 +65,9 @@ class StudentActivationOtp(models.Model):
         return self.email
     
 
-# Unit Information
-class CourseUnits(models.Model):
-    unit_name = models.CharField(max_length=100)
-    unit_code = models.CharField(max_length=100)
-    unit_description = models.CharField(max_length=100)
-    unit_instructor = models.CharField(max_length=100)
-    unit_schedule = models.CharField(max_length=100)
 
-    class Meta:
-        db_table = 'course_unit'
+    
 
-    def __str__(self):
-        return self.unit_name
-    
-    
 # Enrollment Management
 # Grading and Assessment
 # Attendance Tracking
