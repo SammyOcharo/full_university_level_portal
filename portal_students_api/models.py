@@ -5,6 +5,20 @@ from portal_school_department_api.models import SchoolFacultyDepartment
 from portal_schools_api.models import FacultySchool
 User = get_user_model()
 
+#Course Information model
+class StudentCourseInformation(models.Model):
+    course_name = models.CharField(max_length=50)
+    course_ID = models.CharField(max_length=50)
+    course_description = models.CharField(max_length=255)
+    course_duration = models.CharField(max_length=50)
+    course_instructor = models.CharField(max_length= 100)
+
+    class Meta:
+        db_table = 'student_course'
+
+    def __str__(self):
+        return self.course_name
+
 # Create your models here.
 class Student(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -13,7 +27,7 @@ class Student(models.Model):
     school = models.ForeignKey(FacultySchool, on_delete=models.DO_NOTHING)
     department = models.ManyToManyField(SchoolFacultyDepartment)
     school_id_number = models.CharField(max_length=10)
-    course = models.CharField(max_length=100)
+    course = models.ForeignKey(StudentCourseInformation, on_delete=models.DO_NOTHING)
     status = models.IntegerField(default=0)
 
     def __str__(self) -> str:
@@ -34,3 +48,11 @@ class StudentActivationOtp(models.Model):
 
     def __str__(self):
         return self.email
+    
+
+# Unit Information:
+# Enrollment Management
+# Grading and Assessment
+# Attendance Tracking
+# Communication and Notifications
+# Resources and Materials
