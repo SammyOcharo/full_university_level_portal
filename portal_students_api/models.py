@@ -67,7 +67,6 @@ class StudentActivationOtp(models.Model):
 
 # Enrollment Management
 
-
 class Enrollment(models.Model):
     # Enrollment fields
     STATUS_CHOICES = (
@@ -83,6 +82,19 @@ class Enrollment(models.Model):
 
 
 # Grading and Assessment
+
+class Grading(models.Model):
+    # Grading fields
+    unit = models.ForeignKey('CourseUnits', on_delete=models.CASCADE, related_name='gradings')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='gradings')
+    grade = models.DecimalField(max_digits=5, decimal_places=2)
+    # Add other grading fields as needed
+
+class Assessment(models.Model):
+    # Assessment fields
+    unit = models.ForeignKey('CourseUnits', on_delete=models.CASCADE, related_name='assessments')
+    name = models.CharField(max_length=100)
+    weightage = models.DecimalField(max_digits=5, decimal_places=2)
 # Attendance Tracking
 # Communication and Notifications
 # Resources and Materials
