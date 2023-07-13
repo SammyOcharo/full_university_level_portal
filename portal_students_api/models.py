@@ -65,10 +65,23 @@ class StudentActivationOtp(models.Model):
         return self.email
     
 
-
-    
-
 # Enrollment Management
+
+
+class Enrollment(models.Model):
+    # Enrollment fields
+    STATUS_CHOICES = (
+        ('enrolled', 'Enrolled'),
+        ('dropped', 'Dropped'),
+        ('completed', 'Completed'),
+    )
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
+    units = models.ManyToManyField('CourseUnits', related_name='enrollments')
+    enrollment_date = models.DateField()
+    withdrawal_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+
+
 # Grading and Assessment
 # Attendance Tracking
 # Communication and Notifications
