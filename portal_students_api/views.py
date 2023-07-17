@@ -1,5 +1,6 @@
 import random
 import re
+from datetime import date
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,7 +14,7 @@ User = get_user_model()
 from portal_authentication.models import Roles
 from portal_school_department_api.models import SchoolFacultyDepartment
 from portal_schools_api.models import FacultySchool
-from portal_students_api.models import Student, StudentActivationOtp
+from portal_students_api.models import Enrollment, Student, StudentActivationOtp
 
 from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminDeactivateStudentSerializer, AdminSuspendStudentSerializer, AdminViewAllStudentsSerializer
 # Create your views here.
@@ -108,6 +109,8 @@ class AdminCreateStudent(APIView):
                     'status': False,
                     'message': 'error saving student to database'
                 }, status=status.HTTP_400_BAD_REQUEST)
+            today = date.today()
+            Enrollment.objects.create(student=student, units=units, enrollment_date=today)
             
             otp = random.randint(111111,999999)
 

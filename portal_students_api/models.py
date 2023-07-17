@@ -75,10 +75,10 @@ class Enrollment(models.Model):
         ('completed', 'Completed'),
     )
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
-    units = models.ManyToManyField('CourseUnits', related_name='enrollments')
+    units = models.ManyToManyField('CourseUnits', related_name='enrollments', null=True)
     enrollment_date = models.DateField()
     withdrawal_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='enrolled')
 
 
 # Grading and Assessment
