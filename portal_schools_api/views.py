@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from django.contrib.auth import get_user_model
+from django.db import transaction
+
+from portal_students_api.models import StudentCourseInformation
 
 User = get_user_model()
 
@@ -11,7 +14,7 @@ import uuid
 import re
 from portal_schools_api.models import FacultySchool
 
-from portal_schools_api.serializers import AdminActivateSchoolSerializer, AdminCreateSchoolSerializer, AdminDeactivateSchoolSerializer, AdminDeleteSchoolSerializer, AdminViewDetailSchoolSerializer, AdminViewSchoolSerializer
+from portal_schools_api.serializers import AdminActivateSchoolSerializer, AdminCreateCourseSerializer, AdminCreateSchoolSerializer, AdminDeactivateSchoolSerializer, AdminDeleteSchoolSerializer, AdminViewDetailSchoolSerializer, AdminViewSchoolSerializer
 
 
 # Create your views here.
@@ -400,4 +403,85 @@ class AdminViewSchoolAPIView(APIView):
             return Response({
                 'status': False,
                 'message': 'Could not view school!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminCreateCourseAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdminCreateCourseSerializer
+
+    def post(self, request):
+        try:
+            current_user = request.user
+            allowed_roles = ['admin']
+
+            if not current_user.role.short_name in allowed_roles:
+                return Response({
+                    'status': False,
+                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            data = request.data
+
+            serializer = self.serializer_class(data=data)
+
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'Invalid data provided!',
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            course_name = request.data.get('course_name')
+            course_description = request.data.get('course_description')
+            course_duration = request.data.get('course_duration')
+            course_instructor = request.data.get('course_instructor')
+
+            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            valid_email = re.fullmatch(email_regex, current_user)
+
+            if not valid_email:
+                return Response({
+                    'status': False,
+                    'message': 'Invalid email provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(current_user)
+            
+            user = User.objects.filter(email=current_user)
+
+            print(user)
+
+            if not user.exists():
+                return Response({
+                    'status': False,
+                    'message': 'User does not exist'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            course_information = StudentCourseInformation.objects.filter(course_name=course_name)
+
+            if course_information.exists():
+                return Response({
+                'status': False,
+                'message': 'Course already exists'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+            with transaction.atomic():
+                course_information = StudentCourseInformation.objects.create(course_name=course_name, course_description=course_description, course_duration=course_duration, course_instructor=course_instructor)
+                if not course_information:
+                    return Response({
+                        'status': False,
+                        'message': 'Error creating course entry!'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                Response({
+                    'status':   True,
+                    'message': 'Course created sucessfully.'
+                }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(str(e))
+
+            return Response({
+                'status': False,
+                'message': 'Could not create course'
             }, status=status.HTTP_400_BAD_REQUEST)

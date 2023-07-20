@@ -33,3 +33,9 @@ class AdminViewSchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model=FacultySchool
         fields = '__all__'
+
+class AdminCreateCourseSerializer(serializers.Serializer):
+    course_name = serializers.CharField()
+    course_description = serializers.CharField()
+    course_duration = serializers.CharField()
+    course_instructor = serializers.CharField()

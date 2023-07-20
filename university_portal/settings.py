@@ -102,6 +102,7 @@ WSGI_APPLICATION = 'university_portal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'ATOMIC_REQUESTS': True,
         'NAME': config("DATABASE_NAME"),
         'USER': config("DATABASE_USER"),
         'PASSWORD': config("DATABASE_PASSWORD"),
