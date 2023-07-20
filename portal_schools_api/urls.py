@@ -8,4 +8,8 @@ urlpatterns = [
     path('admin-delete-school/', views.AdminDeleteSchoolAPIView.as_view(), name='admin-delete-school-api'),
 
     path('admin-view-school/', views.AdminViewSchoolAPIView.as_view(), name='admin-view-school-api'),
+
+
+    #-------Course endpoints----------
+    path('admin-create-course/', views.AdminCreateCourseAPIView.as_view(), name='admin-create-school-course-api')
 ]

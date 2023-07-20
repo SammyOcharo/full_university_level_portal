@@ -75,7 +75,7 @@ class Enrollment(models.Model):
         ('completed', 'Completed'),
     )
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
-    units = models.ManyToManyField('CourseUnits', related_name='enrollments', null=True)
+    units = models.ManyToManyField('CourseUnits', related_name='enrollments')
     enrollment_date = models.DateField()
     withdrawal_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='enrolled')
@@ -98,3 +98,16 @@ class Assessment(models.Model):
 # Attendance Tracking
 # Communication and Notifications
 # Resources and Materials
+
+class StudentTicket(models.Model):
+    ticket_code = models.CharField(max_length=15)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    message = models.TextField()
+    is_sorted = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'student_tickets'
+        
+
+    def __str__(self) -> str:
+        return self.user.email

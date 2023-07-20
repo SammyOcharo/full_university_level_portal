@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.db import transaction
 from django.contrib.auth import get_user_model
 
 from utils.email_service import admin_student_otp_activate, student_password_details
@@ -24,39 +25,38 @@ class AdminCreateStudent(APIView):
     serializer_class = AdminCreateStudentStudentSErializer
 
     def post(self, request):
-        try:
-            data = request.data
-            current_user = request.user
-            print("current_user: ", current_user)
-            allowed_roles = ['admin']
+        # try:
+        data = request.data
+        current_user = request.user
+        print("current_user: ", current_user)
+        allowed_roles = ['admin']
 
-            if not current_user.role.short_name in allowed_roles:
-                return Response({
-                    'status': False,
-                    'message': f'role {current_user.role.short_name} not allowed to access this resource!'
-                }, status=status.HTTP_400_BAD_REQUEST)
+        if not current_user.role.short_name in allowed_roles:
+            return Response({
+                'status': False,
+                'message': f'role {current_user.role.short_name} not allowed to access this resource!'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.serializer_class(data=data)
+        serializer = self.serializer_class(data=data)
 
-            if not serializer.is_valid():
-                return Response({
-                    'status': False,
-                    'message': 'Invalid data provided!',
-                    'errors': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            school_code = request.data.get('school_code')
-            admin_email = request.data.get('admin_email')
-            department_code = request.data.get('department_code')
-            email = request.data.get('email')
-            mobile_number = request.data.get('mobile_number')
-            id_number = request.data.get('id_number')
-            full_name = request.data.get('full_name')
-            school_id_number = request.data.get('school_id_number')
-            course = request.data.get('course')
+        if not serializer.is_valid():
+            return Response({
+                'status': False,
+                'message': 'Invalid data provided!',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        school_code = request.data.get('school_code')
+        department_code = request.data.get('department_code')
+        email = request.data.get('email')
+        mobile_number = request.data.get('mobile_number')
+        id_number = request.data.get('id_number')
+        full_name = request.data.get('full_name')
+        school_id_number = request.data.get('school_id_number')
+        course = request.data.get('course')
 
-            
-            
+        with transaction.atomic():
+        
             faculty_school = FacultySchool.objects.filter(school_code=school_code)
             faculty_school_first = faculty_school.first()
 
@@ -110,6 +110,7 @@ class AdminCreateStudent(APIView):
                     'message': 'error saving student to database'
                 }, status=status.HTTP_400_BAD_REQUEST)
             today = date.today()
+
             Enrollment.objects.create(student=student, units=units, enrollment_date=today)
             
             otp = random.randint(111111,999999)
@@ -139,13 +140,13 @@ class AdminCreateStudent(APIView):
             }, status=status.HTTP_200_OK)
 
 
-        except Exception as e:
-            print(str(e))
+        # except Exception as e:
+        #     print(str(e))
 
-            return Response({
-                'status': False,
-                'message': 'Could not create student!'
-            }, status=status.HTTP_400_BAD_REQUEST)
+        #     return Response({
+        #         'status': False,
+        #         'message': 'Could not create student!'
+        #     }, status=status.HTTP_400_BAD_REQUEST)
         
 class AdminActivateStudentAPIView(APIView):
     permission_classes = [IsAuthenticated]
