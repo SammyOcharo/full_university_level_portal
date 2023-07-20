@@ -436,14 +436,6 @@ class AdminCreateCourseAPIView(APIView):
             course_duration = request.data.get('course_duration')
             course_instructor = request.data.get('course_instructor')
 
-            email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-            valid_email = re.fullmatch(email_regex, current_user)
-
-            if not valid_email:
-                return Response({
-                    'status': False,
-                    'message': 'Invalid email provided'
-                }, status=status.HTTP_400_BAD_REQUEST)
             
             print(current_user)
             
@@ -473,7 +465,7 @@ class AdminCreateCourseAPIView(APIView):
                         'message': 'Error creating course entry!'
                     }, status=status.HTTP_400_BAD_REQUEST)
 
-                Response({
+                return Response({
                     'status':   True,
                     'message': 'Course created sucessfully.'
                 }, status=status.HTTP_200_OK)
