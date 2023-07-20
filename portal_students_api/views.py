@@ -15,7 +15,7 @@ User = get_user_model()
 from portal_authentication.models import Roles
 from portal_school_department_api.models import SchoolFacultyDepartment
 from portal_schools_api.models import FacultySchool
-from portal_students_api.models import Enrollment, Student, StudentActivationOtp
+from portal_students_api.models import Enrollment, Student, StudentActivationOtp, StudentCourseInformation
 
 from portal_students_api.serializers import AdminActivateStudentSerializer, AdminCreateStudentStudentSErializer, AdminDeactivateStudentSerializer, AdminSuspendStudentSerializer, AdminViewAllStudentsSerializer
 # Create your views here.
@@ -101,6 +101,15 @@ class AdminCreateStudent(APIView):
             user.set_password(password)
 
             user.save()
+
+            course = StudentCourseInformation.objects.filter(id=course)
+            if not course.exists():
+                return Response({
+                    'status': False,
+                    'message': 'course does not exist!'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            course = course.first()
             
             student = Student.objects.create(user=user, student_name=full_name,national_id_number=id_number,  school=faculty_school_first, school_id_number=school_id_number, course=course)
             student.department.add(school_department.first().id)
@@ -111,7 +120,7 @@ class AdminCreateStudent(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             today = date.today()
 
-            Enrollment.objects.create(student=student, units=units, enrollment_date=today)
+            # Enrollment.objects.create(student=student, units=units, enrollment_date=today)
             
             otp = random.randint(111111,999999)
 
