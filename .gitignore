@@ -1,6 +1,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/linux,windows,django,python,visualstudiocode,sublimetext,pycharm+all,intellij+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,windows,django,python,visualstudiocode,sublimetext,pycharm+all,intellij+all
 
+# Django migration files
+**/migrations/
+*.pyc
+*.pyo
+__pycache__/
+
 ### Django ###
 *.log
 *.pot
