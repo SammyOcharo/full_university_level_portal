@@ -111,3 +111,40 @@ class StudentTicket(models.Model):
 
     def __str__(self) -> str:
         return self.user.email
+    
+class Hostel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    hostel_name = models.CharField(max_length=100)
+    hostel_room_number = models.CharField(max_length=100)
+    hostel_entry = models.DateTimeField()
+    hostel_exit = models.DateTimeField()
+
+
+    class Meta:
+        db_table = 'hostel'
+        verbose_name_plural = 'hostels'
+
+    def __str__(self) -> str:
+        return f'{self.user.full_name}-{self.hostel_room_number}'
+    
+
+class StudentMessaging(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    thread_id = models.CharField(max_length=50)
+    is_read = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    attachment = models.FileField(upload_to='message_attachments/', null=True, blank=True)
+    is_draft = models.BooleanField(default=False)
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
+
+    class Meta:
+        db_table = 'student_messages'
+        verbose_name_plural = 'student_messages'
+
+
+    def __str__(self) -> str:
+        return self.user.full_name
