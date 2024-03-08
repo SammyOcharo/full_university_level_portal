@@ -3,7 +3,7 @@ from portal_security_api.choices import USER_ROLES
 
 from portal_students_api.models import Student
 
-# Create your models here.
+
 class Roles(models.Model):
     name = models.CharField(max_length=20, null=False)
     short_name = models.CharField(choices=USER_ROLES, default='', max_length=20, unique=True, blank=False)
